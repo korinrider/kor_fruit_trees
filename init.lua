@@ -34,7 +34,11 @@
 -- /grant singleplayer all
 -- //mtschemcreate
 
-local DEBUG = true
+local MODE = "fast"
+-- set "debug" for avery fast tree growth
+-- set "fast" for a tree that completes a stage in 1/3 minetest sun-day (200 s)
+-- set "normal" for a tree that completes a stage in 1 minetest day (20 minutes) (i.e. different stage on every day) and thus complete cycle in 3 days
+-- set "slower" for a tree that completes a stage in 3 minetest day (60 minutes)
 
 local path = minetest.get_modpath(minetest.get_current_modname()) .. "/"
 
@@ -464,19 +468,46 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
 	})
 
+	-- bone meal
+	if minetest.get_modpath("bonemeal") ~= nil then
+		grow_sapl = function(pos)
+			grow_new_tree(pos, t_dispersion, radius, height, "/schematics/" .. fruit_name .. "_tree", fruit_name, n_variants, t_interval)
+		end
+		bonemeal:add_sapling({{"kor_fruit_trees:" .. fruit_name .. "_sapling", grow_sapl, "soil"}})
+	end
 end
 
 -- reminder for vars (fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance)
-if DEBUG then
-	register_kor_fruit_tree("cherry", 9, 3, 7, 1, 2, 30, 5, 8, "allfaces")
-	register_kor_fruit_tree("orange", 1, 3, 7, 1, 2, 30, 5, 8, "nodebox")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 1, 2, 30, 5, 8, "nodebox")
-	register_kor_fruit_tree("pear", 6, 3, 7, 1, 2, 30, 5, 8, "nodebox")
-else
-	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, 300-15, 30, 8, "allfaces")
-	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, 300-15, 30, 8, "nodebox")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, 300-30, 60, 8, "nodebox")
-	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, 300-30, 60, 8, "nodebox")
+if MODE=="debug" then
+	t_interval = 30
+	register_kor_fruit_tree("cherry", 9, 3, 7, 1, 2, t_interval, 5, 8, "allfaces")
+	register_kor_fruit_tree("orange", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox")
+	register_kor_fruit_tree("pear", 6, 3, 7, 1, 2, t_interval, 5, 8, "nodebox")
+end
+if MODE=="fast" then
+	t_interval = 200
+	t_disp = 30
+	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "allfaces")
+	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "nodebox")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
+	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
+end
+if MODE=="normal" then
+	t_interval = 1200
+	t_disp = 120
+	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-15, t_disp, 8, "allfaces")
+	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-15, t_disp, 8, "nodebox")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
+	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
+end
+if MODE=="slower" then
+	t_interval = 1200*3
+	t_disp = 120*3
+	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 800, t_interval-t_disp/2, t_disp, 8, "allfaces")
+	register_kor_fruit_tree("orange", 1, 3, 7, 200, 800, t_interval-t_disp/2, t_disp, 8, "nodebox")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 800, t_interval-t_disp, t_disp*2, 8, "nodebox")
+	register_kor_fruit_tree("pear", 6, 3, 7, 200, 800, t_interval-t_disp, t_disp*2, 8, "nodebox")
 end
 
 -- frut pole as a tool for harvesting fruit
