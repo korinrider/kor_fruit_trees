@@ -14,14 +14,16 @@
 -- + make a variable for fruiting chance
 -- + make trees grow only on soil
 -- + sapling does check for empty space around it 
--- make trees look better by making the bottom/top of the fruiting block have no fruits
+-- + make trees look better by making the bottom/top of the fruiting block have no fruits
+-- + make bonemeal work
+-- + PUBLISH THE MOD
+-- + make trees saplings craftable
+-- + find good values for the time intervals and make them default instead of debug
+-- make trees spawn in the wild
+
 -- Optional: make leaves look dencer?
 -- Optional: make pear bloom not so intence (think about orang/lemon too)
--- make bonemeal work
 -- make additional variants for lemon/orange 
--- find good values for the time intervals and make them default instead of debug
--- FIX - shematics for oranges and lemons are not working
--- PUBLISH THE MOD
 -- Optionally: make oranges and lemons bloom and fruit all year round
 -- make so that the synchroneous updates are not broaken by the edge of updated chunks
 -- make so that the fruit pole can be used to harvest fruit from a longer distance
@@ -226,7 +228,7 @@ end
 -- a large function that defines a tree
 --------------------------------
 
-local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance, fruit_leaves_type)
+local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance, fruit_leaves_type, craft_from_dye)
 
 	minetest.register_node("kor_fruit_trees:" .. fruit_name .. "_leaves", {
 		description = S( fruit_name .. " tree leaves"),
@@ -410,7 +412,9 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		end,
 	})
 
+	--------------------------------
 	-- wooden stuff
+	--------------------------------
 
 	minetest.register_node("kor_fruit_trees:" .. fruit_name .. "_planks", {
 		description = S( fruit_name .. " Wood Planks"),
@@ -422,51 +426,60 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		sounds = default.node_sound_wood_defaults(),
 	})
 
-	stairs.register_stair_and_slab( fruit_name .. "_wood", "kor_fruit_trees:" .. fruit_name .. "_planks",
-		{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
-		{fruit_name .. "_planks.png"},
-		S(fruit_name .. " Wood Stair"),
-		S(fruit_name .. " Wood Slab"),
-		default.node_sound_wood_defaults()
-	)
+	-- stairs and slabs
+	if minetest.get_modpath("stairs") ~= nil then
+		stairs.register_stair_and_slab( fruit_name .. "_wood", "kor_fruit_trees:" .. fruit_name .. "_planks",
+			{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
+			{fruit_name .. "_planks.png"},
+			S(fruit_name .. " Wood Stair"),
+			S(fruit_name .. " Wood Slab"),
+			default.node_sound_wood_defaults()
+		)
+	end
 
-	default.register_fence("kor_fruit_trees:fence_" .. fruit_name .. "_wood", {
-		description = S(fruit_name .. " Wood Fence"),
-		texture = fruit_name .. "_planks.png",
-		inventory_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
-					"default_fence_overlay.png^[makealpha:255,126,126",
-		wield_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
-					"default_fence_overlay.png^[makealpha:255,126,126",
-		material = "kor_fruit_trees:" .. fruit_name .. "_planks",
-		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
-		sounds = default.node_sound_wood_defaults()
-	})
+	-- fences
+	if minetest.get_modpath("default") ~= nil then
+		default.register_fence("kor_fruit_trees:fence_" .. fruit_name .. "_wood", {
+			description = S(fruit_name .. " Wood Fence"),
+			texture = fruit_name .. "_planks.png",
+			inventory_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
+						"default_fence_overlay.png^[makealpha:255,126,126",
+			wield_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
+						"default_fence_overlay.png^[makealpha:255,126,126",
+			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
+			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
+			sounds = default.node_sound_wood_defaults()
+		})
 
-	default.register_fence_rail("kor_fruit_trees:fence_rail_" .. fruit_name .. "_wood", {
-		description = S(fruit_name .. " Wood Fence Rail"),
-		texture = fruit_name .. "_planks.png",
-		inventory_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
-					"default_fence_rail_overlay.png^[makealpha:255,126,126",
-		wield_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
-					"default_fence_rail_overlay.png^[makealpha:255,126,126",
-		material = "kor_fruit_trees:" .. fruit_name .. "_planks",
-		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
-		sounds = default.node_sound_wood_defaults()
-	})
+		default.register_fence_rail("kor_fruit_trees:fence_rail_" .. fruit_name .. "_wood", {
+			description = S(fruit_name .. " Wood Fence Rail"),
+			texture = fruit_name .. "_planks.png",
+			inventory_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
+						"default_fence_rail_overlay.png^[makealpha:255,126,126",
+			wield_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
+						"default_fence_rail_overlay.png^[makealpha:255,126,126",
+			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
+			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
+			sounds = default.node_sound_wood_defaults()
+		})
 
-	default.register_mesepost("kor_fruit_trees:" .. fruit_name .. "_post_light_willow_wood", {
-		description = S(fruit_name .. " Wood Mese Post Light"),
-		texture = fruit_name .. "_planks.png",
-		material = "kor_fruit_trees:" .. fruit_name .. "_planks",
-		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
-	})
+		default.register_mesepost("kor_fruit_trees:" .. fruit_name .. "_post_light_willow_wood", {
+			description = S(fruit_name .. " Wood Mese Post Light"),
+			texture = fruit_name .. "_planks.png",
+			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
+			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
+		})
+	end
 
-	doors.register_fencegate("kor_fruit_trees:gate_" .. fruit_name .. "_wood", {
-		description = S(fruit_name .. " Wood Fence Gate"),
-		texture = fruit_name .. "_planks.png",
-		material = "kor_fruit_trees:" .. fruit_name .. "_planks",
-		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
-	})
+	-- doors (for now only for gate, not for the door itself)
+	if minetest.get_modpath("doors") ~= nil then
+		doors.register_fencegate("kor_fruit_trees:gate_" .. fruit_name .. "_wood", {
+			description = S(fruit_name .. " Wood Fence Gate"),
+			texture = fruit_name .. "_planks.png",
+			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
+			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
+		})
+	end
 
 	-- bone meal
 	if minetest.get_modpath("bonemeal") ~= nil then
@@ -475,31 +488,47 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		end
 		bonemeal:add_sapling({{"kor_fruit_trees:" .. fruit_name .. "_sapling", grow_sapl, "soil"}})
 	end
+
+	-- craft saplings in a strange way (using dye)
+	if minetest.get_modpath("default") ~= nil then
+		if minetest.get_modpath("dye") then
+			if craft_from_dye ~= nil then
+				minetest.register_craft({
+					output = "kor_fruit_trees:" .. fruit_name .. "_sapling",
+					recipe = {
+						{"", craft_from_dye, ""},
+						{"", "default:sapling", ""},
+						{"", "", ""},
+					}
+				})
+			end
+		end
+	end
 end
 
 -- reminder for vars (fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance)
 if MODE=="debug" then
 	t_interval = 30
-	register_kor_fruit_tree("cherry", 9, 3, 7, 1, 2, t_interval, 5, 8, "allfaces")
-	register_kor_fruit_tree("orange", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox")
-	register_kor_fruit_tree("pear", 6, 3, 7, 1, 2, t_interval, 5, 8, "nodebox")
+	register_kor_fruit_tree("cherry", 9, 3, 7, 1, 2, t_interval, 5, 8, "allfaces", "dye:magenta")
+	register_kor_fruit_tree("orange", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox", "dye:orange")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox", "dye:yellow")
+	register_kor_fruit_tree("pear", 6, 3, 7, 1, 2, t_interval, 5, 8, "nodebox", "dye:green")
 end
 if MODE=="fast" then
 	t_interval = 200
 	t_disp = 30
-	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "allfaces")
-	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "nodebox")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
-	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
+	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "allfaces", "dye:magenta")
+	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "nodebox", "dye:orange")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:yellow")
+	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:green")
 end
 if MODE=="normal" then
 	t_interval = 1200
 	t_disp = 120
-	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-15, t_disp, 8, "allfaces")
-	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-15, t_disp, 8, "nodebox")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
-	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox")
+	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-15, t_disp, 8, "allfaces", "dye:magenta")
+	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-15, t_disp, 8, "nodebox", "dye:orange")
+	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:yellow")
+	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:green")
 end
 if MODE=="slower" then
 	t_interval = 1200*3

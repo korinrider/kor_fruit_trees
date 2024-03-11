@@ -2,3 +2,4 @@ defaults
 stairs
 doors
 bonemeal?
+dye?
