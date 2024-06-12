@@ -19,6 +19,11 @@
 -- + PUBLISH THE MOD
 -- + make trees saplings craftable
 -- + find good values for the time intervals and make them default instead of debug
+-- + add a pawpaw tree
+-- <<<<<<< YOU ARE HERE
+-- + fix the bug with grabing fruit from the leaves using hand (only the last registered fruit is grabed)
+-- + make recipes for the saplings shapeless
+-- make the case in the end of the file more development friendly
 -- make trees spawn in the wild
 
 -- Optional: make leaves look dencer?
@@ -56,10 +61,6 @@ local function print_keys(t)
 	for key,_ in pairs(t) do
 		minetest.chat_send_all(key)
 	end
-end
-
-local function after_place_leaves(...)
-	return default.after_place_leaves(...)
 end
 
 local movement_gravity = tonumber(
@@ -139,10 +140,10 @@ function s_split(inputstr, sep)
 	return t
 end
 
-local harvest_fruit_leaves = function(pos, node, player)
+local harvest_fruit_leaves = function(pos, node, player, itemstack)
 	node = minetest.get_node(pos)
 	local fruit_name = node.name:sub(17, -14)
-	--minetest.chat_send_all("harvesting " .. fruit_name)
+	minetest.chat_send_all("harvesting " .. fruit_name)
 	minetest.swap_node(pos, {name = "kor_fruit_trees:" .. fruit_name .. "_leaves", param2=node.param2})
 	minetest.sound_play(default.node_sound_leaves_defaults(), { pos = pos }, true)
 	if fruit_decay == false then
@@ -153,8 +154,23 @@ local harvest_fruit_leaves = function(pos, node, player)
 		timer:stop()
 		timer:start(2*minetest.get_item_group(node.name, "t_interval")-t)
 	end
-	--minetest.chat_send_all("kor_fruit_trees:".. fruit_name .. "_fruit 1")
-	player:get_inventory():add_item("main", "kor_fruit_trees:".. fruit_name .. "_fruit 1") 
+	local inv = player:get_inventory()
+	if itemstack:item_fits({name = "kor_fruit_trees:".. fruit_name .. "_fruit"}) then
+		itemstack:add_item({name = "kor_fruit_trees:".. fruit_name .. "_fruit"})
+	else
+		local item = player:get_inventory():add_item("main", {name = "kor_fruit_trees:".. fruit_name .. "_fruit"})
+		if item then
+				minetest.add_item(player:getpos(), item)
+		end
+	end
+
+	-- if inv:room_for_item("main", "kor_fruit_trees:".. fruit_name .. "_fruit 1") then
+	-- 	inv:add_item("main", "kor_fruit_trees:".. fruit_name .. "_fruit 1") 
+	-- 	minetest.add_item(player:get_pos(), stack)
+	-- else
+	-- 	minetest.add_item(player:get_pos(), stack)
+	-- end
+	-- minetest.chat_send_all("kor_fruit_trees:".. fruit_name .. "_fruit 1")
 end
 
 local can_grow_fruit_tree = function(pos, min_radius, height)
@@ -205,7 +221,7 @@ local grow_new_tree = function(pos, t_disp, radius, height, schematics, fruit_na
 	trigger_leaf_cycle(pos, radius, height, fruit_name, t_disp, t_interval)
 end
 
-local far_harvest = function(pointed_thing, player)
+local far_harvest = function(pointed_thing, player, itemstack)
 	if pointed_thing.type ~= "node" then
 		return
 	else
@@ -218,7 +234,7 @@ local far_harvest = function(pointed_thing, player)
 		if #pos_list > 0 then
 			for i, p in ipairs(pos_list) do
 				node = minetest.get_node(p)
-				harvest_fruit_leaves(p, node, player)
+				harvest_fruit_leaves(p, node, player, itemstack)
 			end
 		end
 	end
@@ -340,7 +356,6 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		},
 		sounds = default.node_sound_leaves_defaults(),
 		on_rightclick = harvest_fruit_leaves,
-		after_place_node = after_place_leaves,
 		t_interval = t_interval,
 		on_timer = function(pos, elapsed)
 			if fruit_decay then
@@ -392,19 +407,6 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 
 		on_construct = function(pos)
 			minetest.get_node_timer(pos):start(math.random(t_grow_sap_l, t_grow_sap_u))
-		end,
-
-		on_place = function(itemstack, placer, pointed_thing)
-			itemstack = default.sapling_on_place(itemstack, placer, pointed_thing,
-				"kor_fruit_trees:" .. fruit_name .. "_sapling",
-				-- minp, maxp to be checked, relative to sapling pos
-				-- minp_relative.y = 1 because sapling pos has been checked
-				{x = -3, y = 1, z = -3},
-				{x = 3, y = 6, z = 3},
-				-- maximum interval of interior volume check
-				4)
-
-			return itemstack
 		end,
 
 		on_timer = function(pos)
@@ -494,11 +496,11 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		if minetest.get_modpath("dye") then
 			if craft_from_dye ~= nil then
 				minetest.register_craft({
+					type = "shapeless",
 					output = "kor_fruit_trees:" .. fruit_name .. "_sapling",
 					recipe = {
-						{"", craft_from_dye, ""},
-						{"", "default:sapling", ""},
-						{"", "", ""},
+						"default:sapling",
+						craft_from_dye,
 					}
 				})
 			end
@@ -506,38 +508,37 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 	end
 end
 
--- reminder for vars (fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance)
+-- reminder for vars (fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance, fruit_leaves_type, craft_from_dye)
 if MODE=="debug" then
 	t_interval = 30
-	register_kor_fruit_tree("cherry", 9, 3, 7, 1, 2, t_interval, 5, 8, "allfaces", "dye:magenta")
-	register_kor_fruit_tree("orange", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox", "dye:orange")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 1, 2, t_interval, 5, 8, "nodebox", "dye:yellow")
-	register_kor_fruit_tree("pear", 6, 3, 7, 1, 2, t_interval, 5, 8, "nodebox", "dye:green")
+	t_disp = 5
+	t_grow_sap_u = 1
+	t_grow_sap_l = 2
 end
 if MODE=="fast" then
 	t_interval = 200
 	t_disp = 30
-	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "allfaces", "dye:magenta")
-	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-t_disp/2, t_disp, 8, "nodebox", "dye:orange")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:yellow")
-	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:green")
+	t_grow_sap_u = 200
+	t_grow_sap_l = 400
 end
 if MODE=="normal" then
 	t_interval = 1200
 	t_disp = 120
-	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 400, t_interval-15, t_disp, 8, "allfaces", "dye:magenta")
-	register_kor_fruit_tree("orange", 1, 3, 7, 200, 400, t_interval-15, t_disp, 8, "nodebox", "dye:orange")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:yellow")
-	register_kor_fruit_tree("pear", 6, 3, 7, 200, 400, t_interval-t_disp, t_disp*2, 8, "nodebox", "dye:green")
+	t_grow_sap_u = 200
+	t_grow_sap_l = 400
 end
 if MODE=="slower" then
 	t_interval = 1200*3
 	t_disp = 120*3
-	register_kor_fruit_tree("cherry", 9, 3, 7, 200, 800, t_interval-t_disp/2, t_disp, 8, "allfaces")
-	register_kor_fruit_tree("orange", 1, 3, 7, 200, 800, t_interval-t_disp/2, t_disp, 8, "nodebox")
-	register_kor_fruit_tree("lemon", 1, 3, 7, 200, 800, t_interval-t_disp, t_disp*2, 8, "nodebox")
-	register_kor_fruit_tree("pear", 6, 3, 7, 200, 800, t_interval-t_disp, t_disp*2, 8, "nodebox")
+	t_grow_sap_u = 200
+	t_grow_sap_l = 800
 end
+
+register_kor_fruit_tree("cherry", 9, 3, 7, t_grow_sap_u, t_grow_sap_l-t_disp/2, t_interval, t_disp, 8, "allfaces", "dye:magenta")
+register_kor_fruit_tree("orange", 1, 3, 7, t_grow_sap_u, t_grow_sap_l-t_disp, t_interval, t_disp*2, 8, "nodebox", "dye:orange")
+register_kor_fruit_tree("lemon", 1, 3, 7, t_grow_sap_u, t_grow_sap_l-t_disp, t_interval, t_disp*2, 8, "nodebox", "dye:yellow")
+register_kor_fruit_tree("pear", 6, 3, 7, t_grow_sap_u, t_grow_sap_l-t_disp/2, t_interval, t_disp, 8, "nodebox", "dye:dark_green")
+register_kor_fruit_tree("pawpaw", 2, 3, 7, t_grow_sap_u, t_grow_sap_l-t_disp/2, t_interval, t_disp, 8, "nodebox", "dye:green")
 
 -- frut pole as a tool for harvesting fruit
 
@@ -546,10 +547,10 @@ minetest.register_tool("kor_fruit_trees:fruit_pole", {
 	inventory_image = "fruit_pole.png",
 	groups = {tool = 1},
 	on_use = function(itemstack, user, pointed_thing)
-		far_harvest(pointed_thing, user)
+		far_harvest(pointed_thing, user, itemstack)
 	end,
 	on_place = function(itemstack, user, pointed_thing)
-		far_harvest(pointed_thing, user)	
+		far_harvest(pointed_thing, user, itemstack)	
 	end,
 })
 

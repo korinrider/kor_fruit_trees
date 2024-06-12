@@ -7,6 +7,7 @@
 - pear
 - orange
 - lemon
+- pawpaw
 
 ### PAY ATTENTION!
 there are several setting for timing of the leaf cycles
@@ -25,7 +26,7 @@ but way to fast for balanced survival PLEASE USE "normal" or "slower" for your s
 * Colourful woods to use in your builds
 * Different modes for leaf stage in the leaf cycles
 * Bonemeal integration
-* Craft a sapling by combining apple tree sapling with a dye (guess the colour!)
+* Craft a sapling by combining apple tree sapling with a dye (guess the colour!) now shapeless
 
 The mod is still WIP (at leas I am thinking about reworking some texture and/or adding more trees)
 Please make suggestions, and voice ideas!
