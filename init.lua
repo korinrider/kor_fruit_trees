@@ -20,9 +20,12 @@
 -- + make trees saplings craftable
 -- + find good values for the time intervals and make them default instead of debug
 -- + add a pawpaw tree
--- <<<<<<< YOU ARE HERE
 -- + fix the bug with grabing fruit from the leaves using hand (only the last registered fruit is grabed)
 -- + make recipes for the saplings shapeless
+-- + add plank crafting recepie
+-- + remove ebiomes grass from orange tree shematic
+-- + fix textures missing or taken from another mod
+-- <<<<<<< YOU ARE HERE
 -- make the case in the end of the file more development friendly
 -- make trees spawn in the wild
 
@@ -250,7 +253,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		description = S( fruit_name .. " tree leaves"),
 		drawtype = "allfaces",
 		waving = 1,
-		tiles = { fruit_name .. "_leaves.png"},
+		tiles = { "kor_" .. fruit_name .. "_leaves.png"},
 		paramtype = "light",
 		is_ground_content = false,
 		groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1, t_interval = t_interval, fruit_tree_leves=1},
@@ -280,7 +283,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		description = S( fruit_name .. " tree leaves"),
 		drawtype = "allfaces",
 		waving = 1,
-		tiles = { fruit_name .. "_leaves_bloom.png"},
+		tiles = { "kor_" .. fruit_name .. "_leaves_bloom.png"},
 		paramtype = "light",
 		is_ground_content = false,
 		groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1, t_interval = t_interval, fruit_tree_leves=1},
@@ -312,9 +315,9 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 	})
 	
 	if fruit_leaves_type=="nodebox" then
-		fruit_leves_tiles = {fruit_name .. "_leaves.png", fruit_name .. "_leaves.png", fruit_name .. "_leaves_fruit.png", fruit_name .. "_leaves_fruit.png", fruit_name .. "_leaves_fruit.png", fruit_name .. "_leaves_fruit.png"}
+		fruit_leves_tiles = { "kor_" .. fruit_name .. "_leaves.png", "kor_" .. fruit_name .. "_leaves.png", "kor_" .. fruit_name .. "_leaves_fruit.png", "kor_" .. fruit_name .. "_leaves_fruit.png", "kor_" .. fruit_name .. "_leaves_fruit.png", "kor_" .. fruit_name .. "_leaves_fruit.png"}
 	else
-		fruit_leves_tiles = {fruit_name .. "_leaves_fruit.png"}
+		fruit_leves_tiles = { "kor_" .. fruit_name .. "_leaves_fruit.png"}
 	end
 
 	minetest.register_node("kor_fruit_trees:" .. fruit_name .. "_leaves_fruit", {
@@ -328,7 +331,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		},
 		waving = 1,
 		tiles = fruit_leves_tiles,
-		--tiles = {fruit_name .. "_leaves_fruit.png"},
+		--tiles = { "kor_" .. fruit_name .. "_leaves_fruit.png"},
 		paramtype = "light",
 		is_ground_content = false,
 		groups = {snappy = 3, leafdecay = 3, flammable = 2, leaves = 1, t_interval = t_interval, fruit_tree_leves=1},
@@ -367,7 +370,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 
 	minetest.register_node("kor_fruit_trees:" .. fruit_name .. "_trunk", {
 		description = S( fruit_name .. " tree trunk"),
-		tiles = { fruit_name .. "_trunk_section.png",  fruit_name .. "_trunk_section.png",  fruit_name .. "_trunk.png"},
+		tiles = { "kor_" ..  fruit_name .. "_trunk_section.png", "kor_" ..  fruit_name .. "_trunk_section.png", "kor_" .. fruit_name .. "_trunk.png"},
 		paramtype2 = "facedir",
 		is_ground_content = false,
 		groups = {tree = 1, choppy = 2, oddly_breakable_by_hand = 1, flammable = 2},
@@ -380,7 +383,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 
 	minetest.register_craftitem("kor_fruit_trees:" .. fruit_name .. "_fruit", {
 		description = S(fruit_name),
-		inventory_image = fruit_name .. "_fruit.png",
+		inventory_image = "kor_" .. fruit_name .. "_fruit.png",
 		groups = {
 			flammable = 2,
 		},
@@ -390,9 +393,9 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 	minetest.register_node("kor_fruit_trees:" .. fruit_name .. "_sapling", {
 		description = S( fruit_name .. " Tree Sapling"),
 		drawtype = "plantlike",
-		tiles = { fruit_name .. "_sapling.png"},
-		inventory_image =  fruit_name .. "_sapling.png",
-		wield_image =  fruit_name .. "_sapling.png",
+		tiles = { "kor_" ..  fruit_name .. "_sapling.png"},
+		inventory_image = "kor_" .. fruit_name .. "_sapling.png",
+		wield_image = "kor_" .. fruit_name .. "_sapling.png",
 		paramtype = "light",
 		sunlight_propagates = true,
 		walkable = false,
@@ -422,7 +425,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		description = S( fruit_name .. " Wood Planks"),
 		paramtype2 = "facedir",
 		place_param2 = 0,
-		tiles = {fruit_name .. "_planks.png"},
+		tiles = { "kor_" .. fruit_name .. "_planks.png"},
 		is_ground_content = false,
 		groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 		sounds = default.node_sound_wood_defaults(),
@@ -432,7 +435,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 	if minetest.get_modpath("stairs") ~= nil then
 		stairs.register_stair_and_slab( fruit_name .. "_wood", "kor_fruit_trees:" .. fruit_name .. "_planks",
 			{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
-			{fruit_name .. "_planks.png"},
+			{"kor_" .. fruit_name .. "_planks.png"},
 			S(fruit_name .. " Wood Stair"),
 			S(fruit_name .. " Wood Slab"),
 			default.node_sound_wood_defaults()
@@ -443,7 +446,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 	if minetest.get_modpath("default") ~= nil then
 		default.register_fence("kor_fruit_trees:fence_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence"),
-			texture = fruit_name .. "_planks.png",
+			texture = "kor_" .. fruit_name .. "_planks.png",
 			inventory_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
 						"default_fence_overlay.png^[makealpha:255,126,126",
 			wield_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
@@ -455,7 +458,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 
 		default.register_fence_rail("kor_fruit_trees:fence_rail_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence Rail"),
-			texture = fruit_name .. "_planks.png",
+			texture = "kor_" .. fruit_name .. "_planks.png",
 			inventory_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
 						"default_fence_rail_overlay.png^[makealpha:255,126,126",
 			wield_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
@@ -467,7 +470,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 
 		default.register_mesepost("kor_fruit_trees:" .. fruit_name .. "_post_light_willow_wood", {
 			description = S(fruit_name .. " Wood Mese Post Light"),
-			texture = fruit_name .. "_planks.png",
+			texture = "kor_" .. fruit_name .. "_planks.png",
 			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
 			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
 		})
@@ -477,7 +480,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 	if minetest.get_modpath("doors") ~= nil then
 		doors.register_fencegate("kor_fruit_trees:gate_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence Gate"),
-			texture = fruit_name .. "_planks.png",
+			texture = "kor_" .. fruit_name .. "_planks.png",
 			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
 			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1}
 		})
@@ -506,6 +509,13 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 			end
 		end
 	end
+	-- craft planks
+	minetest.register_craft({
+		type = "shapeless",
+		output = "kor_fruit_trees:" .. fruit_name .. "_planks 4",
+		recipe = {
+			"kor_fruit_trees:" .. fruit_name .. "_trunk"
+	}})
 end
 
 -- reminder for vars (fruit_name, n_variants, radius, height, t_grow_sap_u, t_grow_sap_l, t_interval, t_dispersion, fruiting_chance, fruit_leaves_type, craft_from_dye)
