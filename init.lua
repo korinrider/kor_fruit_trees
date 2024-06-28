@@ -447,9 +447,9 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		default.register_fence("kor_fruit_trees:fence_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence"),
 			texture = "kor_" .. fruit_name .. "_planks.png",
-			inventory_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
+			inventory_image = "default_fence_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
 						"default_fence_overlay.png^[makealpha:255,126,126",
-			wield_image = "default_fence_overlay.png^" .. fruit_name .. "_planks.png^" ..
+			wield_image = "default_fence_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
 						"default_fence_overlay.png^[makealpha:255,126,126",
 			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
 			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
@@ -459,9 +459,9 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		default.register_fence_rail("kor_fruit_trees:fence_rail_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence Rail"),
 			texture = "kor_" .. fruit_name .. "_planks.png",
-			inventory_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
+			inventory_image = "default_fence_rail_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
 						"default_fence_rail_overlay.png^[makealpha:255,126,126",
-			wield_image = "default_fence_rail_overlay.png^" .. fruit_name .. "_planks.png^" ..
+			wield_image = "default_fence_rail_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
 						"default_fence_rail_overlay.png^[makealpha:255,126,126",
 			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
 			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
