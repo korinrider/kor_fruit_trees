@@ -25,7 +25,9 @@
 -- + add plank crafting recepie
 -- + remove ebiomes grass from orange tree shematic
 -- + fix textures missing or taken from another mod
+-- + fix the bug with paer tree and ebiomes mode compatibility
 -- <<<<<<< YOU ARE HERE
+-- fix the texturing of the railings
 -- make the case in the end of the file more development friendly
 -- make trees spawn in the wild
 
@@ -433,7 +435,7 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 
 	-- stairs and slabs
 	if minetest.get_modpath("stairs") ~= nil then
-		stairs.register_stair_and_slab( fruit_name .. "_wood", "kor_fruit_trees:" .. fruit_name .. "_planks",
+		stairs.register_stair_and_slab("kor_" .. fruit_name .. "_wood", "kor_fruit_trees:" .. fruit_name .. "_planks",
 			{choppy = 2, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
 			{"kor_" .. fruit_name .. "_planks.png"},
 			S(fruit_name .. " Wood Stair"),
@@ -447,10 +449,10 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		default.register_fence("kor_fruit_trees:fence_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence"),
 			texture = "kor_" .. fruit_name .. "_planks.png",
-			inventory_image = "default_fence_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
-						"default_fence_overlay.png^[makealpha:255,126,126",
-			wield_image = "default_fence_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
-						"default_fence_overlay.png^[makealpha:255,126,126",
+			inventory_image = "kor_default_fence_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
+						"kor_default_fence_overlay.png^[makealpha:255,126,126",
+			wield_image = "kor_default_fence_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
+						"kor_default_fence_overlay.png^[makealpha:255,126,126",
 			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
 			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 3, wood = 1},
 			sounds = default.node_sound_wood_defaults()
@@ -459,10 +461,10 @@ local function register_kor_fruit_tree(fruit_name, n_variants, radius, height, t
 		default.register_fence_rail("kor_fruit_trees:fence_rail_" .. fruit_name .. "_wood", {
 			description = S(fruit_name .. " Wood Fence Rail"),
 			texture = "kor_" .. fruit_name .. "_planks.png",
-			inventory_image = "default_fence_rail_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
-						"default_fence_rail_overlay.png^[makealpha:255,126,126",
-			wield_image = "default_fence_rail_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
-						"default_fence_rail_overlay.png^[makealpha:255,126,126",
+			inventory_image = "kor_default_fence_rail_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
+						"kor_default_fence_rail_overlay.png^[makealpha:255,126,126",
+			wield_image = "kor_default_fence_rail_overlay.png^" .. "kor_" .. fruit_name .. "_planks.png^" ..
+						"kor_default_fence_rail_overlay.png^[makealpha:255,126,126",
 			material = "kor_fruit_trees:" .. fruit_name .. "_planks",
 			groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2, wood = 1},
 			sounds = default.node_sound_wood_defaults()
@@ -554,7 +556,7 @@ register_kor_fruit_tree("pawpaw", 2, 3, 7, t_grow_sap_u, t_grow_sap_l-t_disp/2, 
 
 minetest.register_tool("kor_fruit_trees:fruit_pole", {
 	description = S("Pole fore collecting fruit"),
-	inventory_image = "fruit_pole.png",
+	inventory_image = "kor_fruit_pole.png",
 	groups = {tool = 1},
 	on_use = function(itemstack, user, pointed_thing)
 		far_harvest(pointed_thing, user, itemstack)
